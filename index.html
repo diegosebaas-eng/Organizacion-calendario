@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#151923">
+  <title>Ares 3D | Calendario de oportunidades</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div><strong>ARES 3D</strong><span>GENERAL · GESTIÓN COMERCIAL</span></div>
+      </div>
+      <div class="side-label">ESPACIO DE TRABAJO</div>
+      <button class="nav-item active" data-view="calendar"><span>▦</span> Calendario</button>
+      <button class="nav-item" data-view="opportunities"><span>◇</span> Oportunidades</button>
+      <button class="nav-item" data-view="planning"><span>✓</span> Planificación</button>
+      <div class="sidebar-bottom">
+        <div class="side-label">HERRAMIENTAS</div>
+        <button class="nav-item" id="exportBtn"><span>⇩</span> Exportar respaldo</button>
+        <button class="nav-item" id="importBtn"><span>⇧</span> Importar respaldo</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+        <div class="local-note"><span class="status-dot"></span><div><b>Guardado local</b><small>Los cambios quedan en este navegador.</small></div></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><p class="eyebrow">PANEL DE CONTROL</p><h1 id="pageTitle">Calendario comercial</h1><p class="subtitle">Anticipate a las fechas importantes y convertí cada ocasión en una oportunidad.</p></div>
+        <button class="button primary" id="newOpportunity">＋ Nueva oportunidad</button>
+      </header>
+
+      <section class="stats">
+        <article class="stat-card"><div class="stat-top"><span>Próximas fechas</span><span class="stat-icon blue">◷</span></div><strong id="statUpcoming">0</strong><small>En los próximos 45 días</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Campañas activas</span><span class="stat-icon purple">◇</span></div><strong id="statActive">0</strong><small>Oportunidades en preparación</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Tareas pendientes</span><span class="stat-icon orange">✓</span></div><strong id="statTasks">0</strong><small>Dentro de la ventana de trabajo</small></article>
+      </section>
+
+      <section id="calendarView" class="view">
+        <div class="content-grid">
+          <section class="surface calendar-panel">
+            <div class="section-heading">
+              <div><h2>Calendario</h2><p>Seleccioná un día para ver sus oportunidades.</p></div>
+              <div class="calendar-controls"><button class="icon-button" id="prevMonth" aria-label="Mes anterior">‹</button><button class="button light" id="todayBtn">Hoy</button><button class="icon-button" id="nextMonth" aria-label="Mes siguiente">›</button></div>
+            </div>
+            <div class="month-line"><h3 id="monthLabel"></h3><select id="yearSelect" class="select year-select" aria-label="Año"></select></div>
+            <div class="calendar-grid weekdays"><span>LUN</span><span>MAR</span><span>MIÉ</span><span>JUE</span><span>VIE</span><span>SÁB</span><span>DOM</span></div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="legend">
+              <span><i class="dot commercial"></i> Comercial</span><span><i class="dot holiday"></i> Festividades</span><span><i class="dot education"></i> Educación</span><span><i class="dot profession"></i> Profesiones</span><span><i class="dot sport"></i> Deportes</span><span><i class="dot national"></i> Patrias / otros</span>
+            </div>
+          </section>
+          <aside class="surface focus-panel">
+            <div class="section-heading"><div><h2 id="focusTitle">Próximas oportunidades</h2><p id="focusSubtitle">Fechas para empezar a preparar.</p></div></div>
+            <div id="focusList" class="stack-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="opportunitiesView" class="view hidden">
+        <section class="surface">
+          <div class="section-heading wrap-heading"><div><h2>Todas las oportunidades</h2><p>Administrá las fechas del calendario y tus propias ideas comerciales.</p></div>
+            <div class="filters"><input id="searchInput" class="input" placeholder="Buscar oportunidad..."><select id="categoryFilter" class="select"><option value="">Todas las categorías</option><option>Comercial</option><option>Festividades</option><option>Educación</option><option>Profesiones</option><option>Deportes</option><option>Fechas patrias</option><option>Estacional</option><option>Otros</option></select></div>
+          </div>
+          <div id="allOpportunities" class="opportunity-list"></div>
+        </section>
+      </section>
+
+      <section id="planningView" class="view hidden">
+        <section class="surface">
+          <div class="section-heading"><div><h2>Planificación a 45 días</h2><p>Campañas que ya entraron en su ventana de preparación.</p></div><span class="pill accent-pill">45 DÍAS DE ANTICIPACIÓN</span></div>
+          <div id="campaignList" class="campaign-list"></div>
+        </section>
+      </section>
+
+      <footer class="footer">ARES 3D GENERAL <span>·</span> Calendario comercial editable <span>·</span> Datos guardados en este dispositivo</footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="formModal">
+    <form class="modal" id="opportunityForm">
+      <div class="modal-header"><div><p class="eyebrow">GESTIÓN DE OPORTUNIDADES</p><h2 id="formTitle">Nueva oportunidad</h2></div><button type="button" class="icon-button close-modal" data-close="formModal">×</button></div>
+      <input type="hidden" id="eventId">
+      <div class="form-grid">
+        <label class="full">Nombre de la fecha u oportunidad *<input class="input" id="eventName" required placeholder="Ej. Día del Padre"></label>
+        <label>Fecha *<input class="input" type="date" id="eventDate" required></label>
+        <label>Categoría<select class="select" id="eventCategory"><option>Comercial</option><option>Festividades</option><option>Educación</option><option>Profesiones</option><option>Deportes</option><option>Fechas patrias</option><option>Estacional</option><option>Otros</option></select></label>
+        <label class="full">Descripción / en qué consiste<textarea class="textarea" id="eventDescription" rows="2" placeholder="Contá brevemente qué se conmemora..."></textarea></label>
+        <label class="full">Ideas de productos para impresión 3D<textarea class="textarea" id="eventProducts" rows="3" placeholder="Llaveros, soportes, figuras, organizadores..."></textarea></label>
+        <label class="full">Oportunidad comercial / público objetivo<textarea class="textarea" id="eventOpportunity" rows="2" placeholder="A quién podrías venderle y qué necesidad resolver..."></textarea></label>
+        <label class="full">Notas, precios, costos o referencias<textarea class="textarea" id="eventNotes" rows="2" placeholder="Ideas, enlaces, costos estimados..."></textarea></label>
+        <label>Estado<select class="select" id="eventStatus"><option>Pendiente</option><option>En investigación</option><option>Diseñando</option><option>En producción</option><option>Publicada</option><option>Finalizada</option><option>Descartada</option></select></label>
+        <label>Importancia<select class="select" id="eventPriority"><option>Alta</option><option>Media</option><option>Baja</option></select></label>
+        <label class="check-label full"><input type="checkbox" id="eventConfirmed"> Fecha confirmada oficialmente</label>
+      </div>
+      <div class="modal-actions"><button type="button" class="button danger-text" id="deleteOpportunity">Eliminar</button><div><button type="button" class="button light" data-close="formModal">Cancelar</button><button type="submit" class="button primary">Guardar ficha</button></div></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop hidden" id="detailModal"><div class="modal detail-modal">
+    <div class="modal-header"><div><p class="eyebrow" id="detailCategory"></p><h2 id="detailName"></h2><p class="subtitle" id="detailDate"></p></div><button class="icon-button close-modal" data-close="detailModal">×</button></div>
+    <div id="detailContent" class="detail-content"></div>
+    <div class="modal-actions"><button class="button light" id="detailPlan">Ver planificación</button><button class="button primary" id="detailEdit">Editar ficha</button></div>
+  </div></div>
+
+  <div class="modal-backdrop hidden" id="tasksModal"><div class="modal task-modal">
+    <div class="modal-header"><div><p class="eyebrow">CAMPAÑA COMERCIAL</p><h2>Plan de trabajo</h2><p id="taskEventDate" class="subtitle"></p></div><button class="icon-button close-modal" data-close="tasksModal">×</button></div>
+    <div id="taskEventName" class="task-event-name"></div><div id="taskList" class="task-list"></div>
+    <div class="add-task"><input class="input" id="customTask" placeholder="Agregar una tarea personalizada"><button class="button primary" id="addTask">＋ Agregar</button></div>
+    <div class="modal-actions"><span class="muted small">Las tareas sugeridas se calculan desde la fecha del evento.</span><button class="button light" data-close="tasksModal">Cerrar</button></div>
+  </div></div>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
